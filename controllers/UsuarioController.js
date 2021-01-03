@@ -1,6 +1,7 @@
 import { send } from 'process';
 import bcrypt from 'bcryptjs';
 import models from '../models';
+import token from '../services/token'
 export default {
     add: async(req, res, next) => {
         try {
@@ -101,7 +102,9 @@ export default {
                 //Existe un usuario con ese email
                 let match = await bcrypt.compare(req.body.password, user.password);
                 if (match) {
-                    res.json('Password correcta');
+                    //Como la pw es correcta genero Token:
+                    let tokenReturn = await token.encode(user._id);
+                    res.status(200).json({ user, tokenReturn });
                 } else {
                     res.status(404).send({
                         message: 'La contraseña es incorrecta'
